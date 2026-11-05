@@ -2,7 +2,7 @@
 
 Real mailboxes for all the domains in your Cloudflare account, with webmail and an admin panel. No servers to run: everything runs on Cloudflare Workers, D1 and R2.
 
-> **Early project.** The test suite and a local end-to-end smoke test pass, but sending and receiving real mail through a production mailbox has not been fully verified yet. Don't make this your only mailbox for now. Reports from real deployments are very welcome.
+> **Early project.** Receiving, sending, replying and attachments have been tried on one real deployment with Gmail. Forwarding and sign-up or password-reset emails from other services have not been tested yet. Don't make this your only mailbox for now. Reports from real deployments are very welcome.
 
 ## Why this project
 
@@ -88,9 +88,9 @@ The demo password is public, so it must never be used on a real deployment.
 
 ## Deploy
 
-> This guide hasn't yet been run from start to finish on a new Cloudflare account. If a step fails, please open an issue with what you saw.
+> This guide has been run from a fresh clone on a Cloudflare account that already used Workers and R2, but not yet on a brand-new account. If a step fails, please open an issue with what you saw.
 
-Run these commands from the project folder, after completing [Get the code](#get-the-code).
+Run these commands from the project folder, after completing [Get the code](#get-the-code). Your domains must be active on the Cloudflare account you sign in with.
 
 **1. Create the resources**
 
@@ -107,6 +107,8 @@ The output of this command includes a `database_id`. Keep it for step 2.
 ```bash
 npx wrangler r2 bucket create beecloudmail
 ```
+
+Both commands also print a configuration snippet. You can ignore it, because step 2 generates the configuration for you. If Wrangler says R2 isn't enabled, enable it in the Cloudflare dashboard and run the command again.
 
 **2. Generate your configuration**
 
@@ -138,6 +140,8 @@ npx wrangler deploy -c wrangler.webmail.jsonc
 npx wrangler deploy -c wrangler.admin.jsonc
 ```
 
+The inbound Worker reports `No targets deployed`. That's expected, because it only receives mail. A new `mail.` or `panel.` hostname can take a few minutes to open on your machine.
+
 **4. Set the administrator password**
 
 This starts a setup page on your own machine and prints its address. Open that address and choose a password of at least 14 characters. The username is always `admin`. The page stores only a password hash, and it won't replace an existing administrator.
@@ -148,7 +152,20 @@ npm run set-admin
 
 **5. Connect the panel to Cloudflare**
 
-This starts a local page and prints its address. The page lists the token permissions to grant. Limit the token to your account and to the domains the panel should manage, and don't use a Global API Key. The token is checked, then stored as a secret on the Admin Worker.
+This starts a local page and prints its address. Create a custom token at [Cloudflare API Tokens](https://dash.cloudflare.com/profile/api-tokens) with these permissions, then paste it into the page. Don't use a Global API Key.
+
+| Group   | Permission              | Access |
+| ------- | ----------------------- | ------ |
+| Account | Email Routing Addresses | Read   |
+| Account | Email Sending           | Edit   |
+| Zone    | Zone                    | Read   |
+| Zone    | DNS                     | Read   |
+| Zone    | Zone Settings           | Edit   |
+| Zone    | Email Routing Rules     | Edit   |
+
+Limit the token to your account. For zones, choose either the specific domains the panel should manage, or all zones in the account if you want new domains to appear automatically. The second option gives the panel more reach if it's ever compromised.
+
+The page checks read access, then stores the token as a secret on the Admin Worker. Write access is checked when you enable a domain.
 
 ```bash
 npm run set-token
@@ -159,6 +176,12 @@ npm run set-token
 Sign in to `https://panel.<domain>/` with the username `admin` and the password from step 4, choose **Sync domains**, enable email on a domain, and create a mailbox. Then sign in at `https://mail.<domain>/` and send yourself a test in both directions.
 
 We recommend also putting the panel behind [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/), because it has a single administrator and no 2FA yet.
+
+**If something stops you**
+
+- **A domain shows conflicting MX records:** it receives mail through another provider. Removing those records stops delivery to that provider, so move your mail first, then enable the domain again.
+- **A mailbox says a routing rule already uses its address:** open Email Routing for that domain in Cloudflare, and remove or change the rule for that address.
+- **Sync doesn't show a domain:** check that the domain is active and that your token's zone resources include it.
 
 ## Good to know
 
