@@ -181,6 +181,9 @@ export async function sendMail(request, env) {
   }
   if (attachmentBytes > 3.5 * 1024 * 1024)
     throw new HttpError(413, 'Attachments must total no more than 2.5 MB.');
+  const attachmentBytesList = attachments.map((attachment) =>
+    Uint8Array.from(atob(attachment.content), (c) => c.charCodeAt(0))
+  );
   const headers = {};
   let originalContent;
   if (data.replyId) {
@@ -242,7 +245,7 @@ export async function sendMail(request, env) {
     for (let index = 0; index < attachments.length; index++) {
       const attachment = attachments[index];
       const key = `mailboxes/${env.MAILBOX_ID}/messages/${id}/attachment-${index}`;
-      const bytes = Uint8Array.from(atob(attachment.content), (c) => c.charCodeAt(0));
+      const bytes = attachmentBytesList[index];
       await env.MAIL_STORAGE.put(key, bytes);
       body.attachments.push({
         filename: attachment.filename || 'attachment',
@@ -273,10 +276,11 @@ export async function sendMail(request, env) {
       text: content.text,
       html: content.html,
       headers,
-      attachments: attachments.map((a) => ({
+      // Pass raw bytes: the binding delivers string content as literal text, not decoded base64.
+      attachments: attachments.map((a, index) => ({
         filename: a.filename || 'attachment',
         type: a.type || 'application/octet-stream',
-        content: a.content,
+        content: attachmentBytesList[index],
         disposition: 'attachment',
       })),
     });

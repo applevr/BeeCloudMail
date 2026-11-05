@@ -141,6 +141,27 @@ test('sending fixes From to authenticated mailbox, keeps quoted HTML and dedupli
   );
   assert.equal(f.sent.length, 1);
 });
+test('attachments are sent as raw bytes, not base64 text', async () => {
+  const f = await fixture();
+  const original = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0xff]);
+  const content = btoa(String.fromCharCode(...original));
+  const data = {
+    ...payload,
+    attachments: [{ filename: 'logo.png', type: 'image/png', content }],
+  };
+  const response = await mail.fetch(
+    request('/api/send', f.tokens[0], data, false, 'POST', {
+      'Idempotency-Key': crypto.randomUUID(),
+    }),
+    f.env
+  );
+  assert.equal(response.status, 200);
+  const sent = f.sent[0].attachments[0];
+  assert.ok(sent.content instanceof Uint8Array);
+  assert.deepEqual([...sent.content], [...original]);
+  assert.equal(sent.filename, 'logo.png');
+  assert.equal(sent.type, 'image/png');
+});
 test('rendered HTML requires ownership and image loading is explicit', async () => {
   const f = await fixture();
   const id = await received(f);
