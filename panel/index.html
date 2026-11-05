@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>BeeCloudMail · Control panel</title>
+    <link rel="stylesheet" href="./panel.css" />
+    <script src="./panel.js" defer></script>
+  </head>
+  <body>
+    <section id="login" class="login">
+      <form id="login-form">
+        <span class="eyebrow">BEECLOUDMAIL / CONTROL PANEL</span>
+        <h1>Your domains.<br />One place to manage mail.</h1>
+        <p>Sign in to your private administration workspace.</p>
+        <label for="username">Administrator</label
+        ><input id="username" autocomplete="username" required /><label for="password"
+          >Password</label
+        ><input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          required
+          maxlength="256"
+        /><button class="primary">Sign in →</button>
+        <p id="login-error" class="error" role="alert"></p>
+      </form>
+    </section>
+    <main id="app" hidden>
+      <aside>
+        <div class="brand">◈ &nbsp; BEECLOUDMAIL<small>CONTROL PANEL</small></div>
+        <nav>
+          <button data-view="domains" class="active">◉ &nbsp; Domains</button
+          ><button data-view="mailboxes">✉ &nbsp; Mailboxes</button
+          ><button data-view="operations">↻ &nbsp; Operations</button>
+        </nav>
+        <div class="aside-bottom">
+          <span id="admin-name">Administrator</span><button id="logout">Sign out</button>
+        </div>
+      </aside>
+      <section class="workspace">
+        <header>
+          <div>
+            <span class="eyebrow">YOUR PRIVATE MAIL INFRASTRUCTURE</span>
+            <h1 id="view-title">Domains</h1>
+          </div>
+          <button id="refresh" class="secondary">Refresh</button>
+        </header>
+        <p id="local-banner" class="notice" hidden>
+          Local demo · sample domains · no real Cloudflare changes or emails.
+        </p>
+        <div class="stats">
+          <div><small>DOMAINS</small><strong id="domain-count">0</strong></div>
+          <div><small>READY FOR MAIL</small><strong id="ready-count">0</strong></div>
+          <div><small>MAILBOXES</small><strong id="mailbox-count">0</strong></div>
+        </div>
+        <section id="domains-view">
+          <div class="section-heading">
+            <div>
+              <h2>Connected domains</h2>
+              <p>Select which of your domains should use BeeCloudMail.</p>
+            </div>
+            <button id="sync" class="primary">Sync Cloudflare domains</button>
+          </div>
+          <div id="domains" class="domain-grid"></div>
+        </section>
+        <section id="mailboxes-view" hidden>
+          <div class="section-heading">
+            <div>
+              <h2>Your mailboxes</h2>
+              <p>One email address and password per mailbox.</p>
+            </div>
+            <button id="create" class="primary">＋ Create mailbox</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mailbox</th>
+                  <th>Domain</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="mailboxes"></tbody>
+            </table>
+          </div>
+        </section>
+        <section id="operations-view" hidden>
+          <div class="section-heading">
+            <div>
+              <h2>Recent operations</h2>
+              <p>Review provisioning progress and retry interrupted tasks.</p>
+            </div>
+          </div>
+          <div id="operations"></div>
+          <h2 class="audit-title">Administration history</h2>
+          <div id="audit"></div>
+        </section>
+        <p id="page-error" class="error" role="alert"></p>
+      </section>
+    </main>
+    <dialog id="mailbox-dialog">
+      <form id="mailbox-form">
+        <header>
+          <h2>Create mailbox</h2>
+          <button type="button" data-close class="close" aria-label="Close">×</button>
+        </header>
+        <label for="domain-select">Domain</label
+        ><select id="domain-select" required></select
+        ><label for="local-part">Mailbox name</label
+        ><input id="local-part" placeholder="support" required maxlength="64" />
+        <p id="address-preview" class="muted"></p>
+        <label for="display-name">Display name</label
+        ><input id="display-name" required maxlength="100" placeholder="Customer Support" /><label
+          for="mailbox-password"
+          >Password</label
+        ><input
+          id="mailbox-password"
+          type="password"
+          autocomplete="new-password"
+          minlength="14"
+          maxlength="256"
+          required
+        />
+        <p id="create-error" class="error" role="alert"></p>
+        <button class="primary" id="create-submit">Create mailbox</button>
+      </form>
+    </dialog>
+    <dialog id="action-dialog">
+      <form id="action-form">
+        <header>
+          <h2 id="action-title"></h2>
+          <button type="button" data-close class="close" aria-label="Close">×</button>
+        </header>
+        <p id="action-description"></p>
+        <label id="action-label" for="action-value"></label
+        ><input id="action-value" maxlength="256" />
+        <p id="action-error" class="error" role="alert"></p>
+        <button id="action-submit" class="primary">Save</button>
+      </form>
+    </dialog>
+    <div id="toast" role="status" hidden></div>
+  </body>
+</html>

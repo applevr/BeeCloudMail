@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>BeeCloudMail · Mail</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <section id="login" class="login-screen">
+      <div class="login-art">
+        <div class="brand">
+          <span class="mark">B</span> BEECLOUDMAIL <span class="brand-light">/ MAIL</span>
+        </div>
+        <div class="login-copy">
+          <span class="eyebrow">YOUR PRIVATE INBOX</span>
+          <h1>Every conversation.<br />One private place.</h1>
+          <p>Your private inbox for BeeCloudMail.</p>
+        </div>
+        <span class="login-foot">BEECLOUDMAIL · WEBMAIL</span>
+      </div>
+      <div class="login-panel">
+        <form id="login-form">
+          <span class="eyebrow">WELCOME BACK</span>
+          <h2>Open your inbox</h2>
+          <p class="muted">Your domain. Your inbox.</p>
+          <label for="email">Email address</label
+          ><input
+            id="email"
+            type="email"
+            autocomplete="username"
+            required
+            placeholder="you@yourdomain.com"
+          /><label for="password">Password</label
+          ><input
+            id="password"
+            type="password"
+            autocomplete="current-password"
+            required
+            maxlength="256"
+            placeholder="Enter your webmail password"
+          /><button class="primary wide" id="login-submit">
+            Sign in <span aria-hidden="true">→</span>
+          </button>
+          <p id="login-error" class="error" role="alert"></p>
+          <small>Your session lasts up to 12 hours.</small>
+        </form>
+      </div>
+    </section>
+    <main id="mail-app" class="mail-shell" hidden>
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="mark">B</span>
+          <div>BEECLOUDMAIL<small>PRIVATE MAIL</small></div>
+        </div>
+        <button id="compose" class="primary">＋ Compose</button>
+        <nav aria-label="Folders">
+          <button data-folder="inbox" class="nav-item active">
+            <span>↙ &nbsp;Inbox</span><span id="unread" class="badge">0</span></button
+          ><button data-folder="sent" class="nav-item"><span>↗ &nbsp;Sent</span></button
+          ><button data-folder="trash" class="nav-item"><span>⌫ &nbsp;Trash</span></button>
+        </nav>
+        <div class="sidebar-bottom">
+          <span class="avatar">CM</span>
+          <div>
+            <strong>BeeCloudMail</strong><small id="mailbox">Your domain. Your inbox.</small>
+          </div>
+          <button id="logout" class="icon-button" aria-label="Sign out" title="Sign out">⇥</button>
+        </div>
+      </aside>
+      <section class="mail-content">
+        <header class="topbar">
+          <div>
+            <span class="eyebrow">WORKSPACE / MAIL</span>
+            <h1 id="folder-title">Inbox</h1>
+          </div>
+          <div class="topbar-actions">
+            <label class="search"
+              ><span aria-hidden="true">⌕</span
+              ><input
+                id="search"
+                type="search"
+                placeholder="Search this folder"
+                aria-label="Search this folder" /></label
+            ><button id="refresh" class="icon-button" title="Refresh" aria-label="Refresh">
+              ↻
+            </button>
+          </div>
+        </header>
+        <div class="mail-workspace">
+          <section class="message-list" aria-label="Message list">
+            <div class="list-header">
+              <span id="list-count">Your inbox</span><span>RECENT</span>
+            </div>
+            <div id="messages"></div>
+            <div id="pagination" class="pagination" hidden>
+              <button id="previous">← Previous</button><span id="page-number"></span
+              ><button id="next">Next →</button>
+            </div>
+          </section>
+          <section id="reader" class="reader">
+            <div class="empty-reader">
+              <span class="empty-symbol">✉</span>
+              <h2>A little space to focus.</h2>
+              <p>Choose a message to read, or start a new conversation.</p>
+              <button id="empty-compose" class="subtle">Compose a message →</button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <dialog id="compose-dialog">
+      <form id="compose-form">
+        <header class="dialog-header">
+          <div>
+            <span class="eyebrow">FROM YOUR MAILBOX</span>
+            <h2>New message</h2>
+          </div>
+          <button type="button" id="close-compose" class="icon-button" aria-label="Close">×</button>
+        </header>
+        <label for="to">To</label
+        ><input
+          id="to"
+          type="text"
+          required
+          placeholder="email@example.com; email2@example.com"
+          autocomplete="off"
+        /><label for="subject">Subject</label
+        ><input id="subject" required maxlength="500" placeholder="Add a subject" /><label
+          for="body"
+          >Message</label
+        ><textarea
+          id="body"
+          required
+          maxlength="100000"
+          placeholder="Write your message…"
+        ></textarea>
+        <section id="reply-quote" class="reply-quote" hidden></section>
+        <div class="attachment-picker">
+          <label for="files">↗ Attach files</label><input id="files" type="file" multiple /><small
+            >Up to 2.5 MB total · 10 files</small
+          >
+        </div>
+        <div id="file-list" class="muted"></div>
+        <p id="compose-error" class="error" role="alert"></p>
+        <footer class="dialog-footer">
+          <span class="muted">Send from your mailbox</span
+          ><button class="primary" id="send-submit">Send message ↗</button>
+        </footer>
+      </form>
+    </dialog>
+    <div id="toast" class="toast" role="status" hidden></div>
+  </body>
+</html>

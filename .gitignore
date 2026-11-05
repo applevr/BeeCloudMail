@@ -1,0 +1,16 @@
+node_modules/
+.wrangler/
+.dev/
+.dev.vars
+.env*
+dist/
+
+# Your deployment's configuration. Generate it with `npm run init-config`.
+wrangler.webmail.jsonc
+wrangler.admin.jsonc
+wrangler.inbound.jsonc
+wrangler.local.jsonc
+
+# Notes about a specific deployment. Never publish these.
+private/
+HANDOFF.md

@@ -1,0 +1,11 @@
+PRAGMA foreign_keys=ON;
+CREATE TABLE domains(id TEXT PRIMARY KEY, name TEXT NOT NULL UNIQUE, zone_id TEXT NOT NULL UNIQUE, state TEXT NOT NULL DEFAULT 'discovered', sending_ready INTEGER NOT NULL DEFAULT 0, routing_ready INTEGER NOT NULL DEFAULT 0, last_error TEXT, updated_at TEXT NOT NULL);
+CREATE TABLE mailboxes(id TEXT PRIMARY KEY, domain_id TEXT NOT NULL REFERENCES domains(id), address TEXT NOT NULL UNIQUE COLLATE NOCASE, display_name TEXT NOT NULL, password_hash TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'provisioning' CHECK(status IN ('provisioning','active','suspended','deleting')), forward_to TEXT, routing_rule_id TEXT, created_at TEXT NOT NULL);
+CREATE TABLE messages(id TEXT PRIMARY KEY, mailbox_id TEXT NOT NULL REFERENCES mailboxes(id), folder TEXT NOT NULL CHECK(folder IN ('inbox','sent','trash')), previous_folder TEXT, sender TEXT NOT NULL, recipients TEXT NOT NULL, subject TEXT NOT NULL, snippet TEXT NOT NULL DEFAULT '', received_at TEXT NOT NULL, is_read INTEGER NOT NULL DEFAULT 0, body_key TEXT NOT NULL, raw_key TEXT, message_id TEXT, delivery_status TEXT NOT NULL DEFAULT 'received', error_code TEXT, attachment_count INTEGER NOT NULL DEFAULT 0);
+CREATE INDEX messages_mailbox_folder_date ON messages(mailbox_id,folder,received_at DESC);
+CREATE TABLE mailbox_sessions(token_hash TEXT PRIMARY KEY, mailbox_id TEXT NOT NULL REFERENCES mailboxes(id) ON DELETE CASCADE, expires_at INTEGER NOT NULL);
+CREATE TABLE admin_users(id TEXT PRIMARY KEY, username TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL);
+CREATE TABLE admin_sessions(token_hash TEXT PRIMARY KEY, admin_id TEXT NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE, expires_at INTEGER NOT NULL);
+CREATE TABLE rate_limits(bucket TEXT PRIMARY KEY, attempts INTEGER NOT NULL, expires_at INTEGER NOT NULL);
+CREATE TABLE provisioning_operations(id TEXT PRIMARY KEY, target_id TEXT NOT NULL, kind TEXT NOT NULL, state TEXT NOT NULL, error TEXT, updated_at TEXT NOT NULL);
+CREATE TABLE audit_events(id TEXT PRIMARY KEY, admin_id TEXT NOT NULL, action TEXT NOT NULL, target_id TEXT, created_at TEXT NOT NULL);

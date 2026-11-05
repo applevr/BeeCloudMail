@@ -1,0 +1,11 @@
+node_modules/
+.wrangler/
+.dev/
+dist/
+private/
+HANDOFF.md
+package-lock.json
+wrangler.webmail.jsonc
+wrangler.admin.jsonc
+wrangler.inbound.jsonc
+wrangler.local.jsonc

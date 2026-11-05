@@ -1,0 +1,44 @@
+{
+  "name": "beecloudmail-webmail",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-13",
+  "workers_dev": false,
+  "preview_urls": false,
+  "vars": {
+    "MAIL_HOST": "mail.example.com",
+    "PANEL_HOST": "panel.example.com",
+    "CF_ACCOUNT_ID": "00000000000000000000000000000000",
+    "INBOUND_WORKER": "beecloudmail-inbound"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "beecloudmail",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "r2_buckets": [
+    {
+      "binding": "MAIL_STORAGE",
+      "bucket_name": "beecloudmail"
+    }
+  ],
+  "send_email": [
+    {
+      "name": "EMAIL"
+    }
+  ],
+  "account_id": "00000000000000000000000000000000",
+  "routes": [
+    {
+      "pattern": "mail.example.com",
+      "custom_domain": true
+    }
+  ]
+}
