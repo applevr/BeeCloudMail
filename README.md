@@ -51,12 +51,27 @@ The Cloudflare API token is available only to the Admin Worker. Only the Webmail
 - [Email Sending](https://developers.cloudflare.com/email-service/) is in beta and Cloudflare presents it as a transactional email service. Limits and terms may change, so check that it suits your use.
 - Node.js 24 or newer.
 
+## Get the code
+
+You need this for both the local demo and a real deployment.
+
+```bash
+git clone https://github.com/applevr/BeeCloudMail.git
+```
+
+```bash
+cd BeeCloudMail
+```
+
+```bash
+npm ci
+```
+
 ## Try it locally
 
 No Cloudflare account needed. The demo uses local storage and simulated Cloudflare responses, and sends no mail.
 
 ```bash
-npm ci
 npm run db:local
 npm run seed:local
 npm run dev
@@ -73,6 +88,10 @@ The demo password is public, so it must never be used on a real deployment.
 
 ## Deploy
 
+> This guide hasn't yet been run from start to finish on a new Cloudflare account. If a step fails, please open an issue with what you saw.
+
+Run these commands from the project folder, after completing [Get the code](#get-the-code).
+
 **1. Create the resources**
 
 ```bash
@@ -82,6 +101,8 @@ npx wrangler login
 ```bash
 npx wrangler d1 create beecloudmail
 ```
+
+The output of this command includes a `database_id`. Keep it for step 2.
 
 ```bash
 npx wrangler r2 bucket create beecloudmail
@@ -94,6 +115,10 @@ The apps are served from `mail.<domain>` and `panel.<domain>`. Make sure neither
 ```bash
 npm run init-config -- --account-id <account-id> --database-id <database-id> --domain <domain>
 ```
+
+- `<account-id>`: run `npx wrangler whoami` and copy the 32-character Account ID.
+- `<database-id>`: the `database_id` from step 1.
+- `<domain>`: the domain that hosts the apps, without `mail.` or `panel.`, for example `example.com`.
 
 **3. Create the tables and deploy the Workers**
 
@@ -115,7 +140,7 @@ npx wrangler deploy -c wrangler.admin.jsonc
 
 **4. Set the administrator password**
 
-This opens a setup page on your own machine. It stores only a password hash, and it won't replace an existing administrator.
+This starts a setup page on your own machine and prints its address. Open that address and choose a password of at least 14 characters. The username is always `admin`. The page stores only a password hash, and it won't replace an existing administrator.
 
 ```bash
 npm run set-admin
@@ -123,7 +148,7 @@ npm run set-admin
 
 **5. Connect the panel to Cloudflare**
 
-This opens a local page listing the token permissions to grant. Limit the token to your account and to the domains the panel should manage, and don't use a Global API Key. The token is checked, then stored as a secret on the Admin Worker.
+This starts a local page and prints its address. The page lists the token permissions to grant. Limit the token to your account and to the domains the panel should manage, and don't use a Global API Key. The token is checked, then stored as a secret on the Admin Worker.
 
 ```bash
 npm run set-token
@@ -131,7 +156,7 @@ npm run set-token
 
 **6. Add your first mailbox**
 
-Sign in to `https://panel.<domain>/`, choose **Sync domains**, enable email on a domain, and create a mailbox. Then sign in at `https://mail.<domain>/` and send yourself a test in both directions.
+Sign in to `https://panel.<domain>/` with the username `admin` and the password from step 4, choose **Sync domains**, enable email on a domain, and create a mailbox. Then sign in at `https://mail.<domain>/` and send yourself a test in both directions.
 
 We recommend also putting the panel behind [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/), because it has a single administrator and no 2FA yet.
 
